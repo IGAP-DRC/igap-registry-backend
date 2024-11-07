@@ -1,10 +1,15 @@
-HELP.md
+# Fichiers générés par Maven
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# Fichiers de construction Gradle (si jamais vous utilisez Gradle)
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Fichiers spécifiques à Spring Tool Suite (STS)
 .apt_generated
 .classpath
 .factorypath
@@ -13,21 +18,54 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# Fichiers spécifiques à IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# Fichiers spécifiques à NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
+# Fichiers spécifiques à Eclipse
+/.metadata/
+/bin/
+/tmp/
+/*.tmp
+/*.bak
+*.swp
+
+# Fichiers spécifiques à VS Code
 .vscode/
+
+# Logs et fichiers temporaires
+*.log
+*.tmp
+*.bak
+
+# Fichiers de configuration du système d'exploitation (ex. macOS, Linux, Windows)
+.DS_Store
+Thumbs.db
+
+# Fichiers de dépendances locales (ex. Node.js, Python)
+node_modules/
+.env
+
+# Fichiers générés par Lombok (si vous utilisez Lombok)
+.lombok/
+
+# Fichier de sortie des tests unitaires et rapports de couverture de code
+test-output/
+coverage/
+jacoco.exec
+
+# Fichier JAR ou WAR généré lors du build
+*.jar
+*.war
+
+# Répertoires de cache locaux (facultatif, mais souvent utile)
+.cache/
