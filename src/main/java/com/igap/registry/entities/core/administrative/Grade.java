@@ -13,13 +13,6 @@ import java.util.List;
 @Setter
 @Entity
 public class Grade extends BaseEntity {
-
     @Enumerated(EnumType.STRING)
     private CategoryGrade category;
-
-    @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AgentGrade> agentGrades;
-
-    @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Promotion> promotions;
 }

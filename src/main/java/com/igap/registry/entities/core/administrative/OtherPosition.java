@@ -15,9 +15,6 @@ import java.util.Date;
 @Entity
 @NoArgsConstructor
 public class OtherPosition extends NameEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Enumerated(EnumType.STRING)
     private TypePosition typePosition;

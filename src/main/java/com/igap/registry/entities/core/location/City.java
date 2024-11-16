@@ -17,6 +17,6 @@ public class City extends NameEntity {
     @JoinColumn(name = "province_id")
     private Province province;
 
-    @OneToMany(mappedBy = "ville", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Municipality> municipalities;
 }
