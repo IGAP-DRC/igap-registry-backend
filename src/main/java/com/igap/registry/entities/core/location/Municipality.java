@@ -11,6 +11,14 @@ import lombok.Setter;
 
 import java.util.List;
 
+
+/**
+ * class Municipality
+ *
+ * @author mecao@main <jbmbiya1@gmail.com>
+ * @update  2024 by mecao@main <jbmbiya1@gmail.com>
+ * @copyright 2024 AGAP
+ */
 @Getter
 @Setter
 @Entity

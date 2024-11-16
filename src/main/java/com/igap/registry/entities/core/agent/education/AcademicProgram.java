@@ -1,13 +1,14 @@
-package com.igap.registry.entities.core.location;
+package com.igap.registry.entities.core.agent.education;
+
 
 import com.igap.registry.entities.base.NameEntity;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.UUID;
 
 /**
- * class Neighborhood
+ * class AcademicProgram
  *
  * @author mecao@main <jbmbiya1@gmail.com>
  * @update  2024 by mecao@main <jbmbiya1@gmail.com>
@@ -15,10 +16,14 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
-public class Neighborhood extends NameEntity {
-    @ManyToOne
-    @JoinColumn(name = "municipality_id", nullable = false)
-    private Municipality municipality;
+public class AcademicProgram extends NameEntity {
+
+    public AcademicProgram(String name) {
+        this.name = name;
+    }
+
+    public AcademicProgram(UUID id) {
+        super(id);
+    }
 }

@@ -1,4 +1,4 @@
-package com.igap.registry.entities.core.agent;
+package com.igap.registry.entities.core.agent.agent;
 
 public interface AgentAssignment
 
