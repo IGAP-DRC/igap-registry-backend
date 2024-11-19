@@ -1,7 +1,8 @@
-package com.igap.registry.entities.core.agent.agent;
+package com.igap.registry.entities.core.agent;
 
 import com.igap.registry.entities.base.BaseEntity;
 import com.igap.registry.entities.core.enums.ContactType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
 public class AgentContact extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ContactType type;// Enum pour Type de contact (téléphone ou email)

@@ -2,14 +2,11 @@ package com.igap.registry.entities.core.agent.education;
 
 
 import com.igap.registry.entities.base.BaseEntity;
-import com.igap.registry.entities.core.agent.agent.Agent;
+import com.igap.registry.entities.core.agent.Agent;
 import com.igap.registry.entities.core.location.City;
 import com.igap.registry.entities.core.location.Country;
 import com.igap.registry.entities.core.location.Province;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +22,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
 public class AcademicHistory extends BaseEntity {
 
     @Column
