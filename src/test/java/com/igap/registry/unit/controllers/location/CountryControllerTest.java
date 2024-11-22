@@ -21,6 +21,10 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * @author Joe Monkila
+ */
+
 @WebMvcTest(CountryController.class)
 class CountryControllerTest {
 
@@ -47,8 +51,8 @@ class CountryControllerTest {
         when(countryService.saveCountry(Mockito.any(Country.class))).thenReturn(country);
 
         mockMvc.perform(post("/api/countries")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(country)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(country)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("RD Congo"));
 
@@ -60,7 +64,7 @@ class CountryControllerTest {
         when(countryService.getCountryById(country.getId())).thenReturn(Optional.of(country));
 
         mockMvc.perform(get("/api/countries/{id}", country.getId())
-                        .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("RD Congo"));
 
@@ -72,7 +76,7 @@ class CountryControllerTest {
         when(countryService.getCountryById(country.getId())).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/countries/{id}", country.getId())
-                        .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
         verify(countryService, times(1)).getCountryById(country.getId());
@@ -87,7 +91,7 @@ class CountryControllerTest {
         when(countryService.getAllCountries()).thenReturn(Arrays.asList(country, country2));
 
         mockMvc.perform(get("/api/countries")
-                        .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].name").value("RD Congo"))
@@ -101,7 +105,7 @@ class CountryControllerTest {
         doNothing().when(countryService).deleteCountry(country.getId());
 
         mockMvc.perform(delete("/api/countries/{id}", country.getId())
-                        .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(countryService, times(1)).deleteCountry(country.getId());

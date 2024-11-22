@@ -22,8 +22,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
-  @author Joe Monkila
-**/
+ * @author Joe Monkila
+ */
 
 @WebMvcTest(CityController.class)
 class CityControllerTest {
@@ -35,7 +35,7 @@ class CityControllerTest {
     private CityService cityService;
 
     @Autowired
-    private ObjectMapper objectMapper; 
+    private ObjectMapper objectMapper;
 
     private City city;
 
