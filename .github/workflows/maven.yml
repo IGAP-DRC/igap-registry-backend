@@ -1,0 +1,48 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Run tests with Maven
+      run: mvn -B clean verify --file pom.xml
+
+    - name: Send email notification
+      if: always() # Cette étape s'exécute toujours, peu importe le statut précédent
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "GitHub Actions Notification: ${{ github.workflow }} - ${{ job.status }}"
+        body: |
+          Hello team,
+
+          The workflow **${{ github.workflow }}** has finished executing on branch **${{ github.ref_name }}**.
+
+          **Status**: ${{ job.status }}
+          **Repository**: ${{ github.repository }}
+          **Commit**: ${{ github.sha }}
+
+          Regards,
+          GitHub Actions
+        to: igap-drc-devs@googlegroups.com
+        from: "GitHub Actions <${{ secrets.SMTP_USERNAME }}>"
