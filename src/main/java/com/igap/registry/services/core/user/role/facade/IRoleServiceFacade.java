@@ -1,9 +1,5 @@
 package com.igap.registry.services.core.user.role.facade;
 
-
-
-
-
 import com.igap.registry.entities.core.user.Role;
 import com.igap.registry.services.interfaces.IAddService;
 import com.igap.registry.services.interfaces.ICountService;
@@ -21,5 +17,4 @@ import org.springframework.lang.NonNull;
  */
 public abstract class IRoleServiceFacade implements IFindAllService<Role>, IFindByIdService<Role>, IAddService<Role>, ICountService {
     protected abstract Boolean isExistByName(@NonNull String name);
-    protected abstract Role findBySlug(String name);
 }
