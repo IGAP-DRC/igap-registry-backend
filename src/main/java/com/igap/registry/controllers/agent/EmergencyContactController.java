@@ -1,7 +1,7 @@
 package com.igap.registry.controllers.agent;
 
 import com.igap.registry.entities.core.agent.EmergencyContact;
-import com.igap.registry.services.agent.EmergencyContactService;
+import com.igap.registry.services.core.agent.EmergencyContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,7 @@
 package com.igap.registry.controllers.agent.education;
 
 import com.igap.registry.entities.core.agent.education.AcademicProgram;
-import com.igap.registry.services.agent.education.AcademicProgramService;
+import com.igap.registry.services.core.agent.education.AcademicProgramService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

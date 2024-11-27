@@ -1,7 +1,7 @@
 package com.igap.registry.controllers.location;
 
 import com.igap.registry.entities.core.location.Country;
-import com.igap.registry.services.location.CountryService;
+import com.igap.registry.services.core.location.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

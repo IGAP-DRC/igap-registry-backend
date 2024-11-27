@@ -1,7 +1,7 @@
 package com.igap.registry.controllers.agent;
 
 import com.igap.registry.entities.core.agent.AgentGrade;
-import com.igap.registry.services.agent.AgentGradeService;
+import com.igap.registry.services.core.agent.AgentGradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

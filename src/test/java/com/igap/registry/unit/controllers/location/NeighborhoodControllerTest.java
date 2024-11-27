@@ -3,7 +3,7 @@ package com.igap.registry.unit.controllers.location;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.igap.registry.controllers.location.NeighborhoodController;
 import com.igap.registry.entities.core.location.Neighborhood;
-import com.igap.registry.services.location.NeighborhoodService;
+import com.igap.registry.services.core.location.NeighborhoodService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

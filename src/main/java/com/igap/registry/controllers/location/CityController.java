@@ -1,7 +1,7 @@
 package com.igap.registry.controllers.location;
 
 import com.igap.registry.entities.core.location.City;
-import com.igap.registry.services.location.CityService;
+import com.igap.registry.services.core.location.CityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
