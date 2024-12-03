@@ -5,6 +5,7 @@ import com.igap.registry.dto.auth.request.RegisterRequest;
 import com.igap.registry.dto.auth.response.LoginResponse;
 import com.igap.registry.dto.utils.ErrorResponse;
 import com.igap.registry.entities.core.user.User;
+import com.igap.registry.helper.MessageException;
 import com.igap.registry.repositories.user.UserRepository;
 import com.igap.registry.security.jwt.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -54,6 +56,7 @@ public class AuthController {
             User userDetails = (User) authentication.getPrincipal();
             Map<String, String> jwtCookie = jwtUtils.generateJwtToken(userDetails.getUsername(), 36000);
 
+            @SuppressWarnings("rawtypes")
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setStatus(200);
             loginResponse.setMessage("Authentification réussie.");
@@ -78,13 +81,13 @@ public class AuthController {
 
         if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
             ErrorResponse errorResponse = new ErrorResponse(400, new Date(), "Erreur",
-                    "Le nom d'utilisateur est déjà pris.");
+                    MessageException.ACCOUNT_NAME_IS_BUSY);
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
         if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
             ErrorResponse errorResponse = new ErrorResponse(400, new Date(), "Erreur",
-                    "L'adresse e-mail est déjà utilisée.");
+                    MessageException.ACCOUNT_MAIL_IS_BUSY);
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
@@ -99,5 +102,37 @@ public class AuthController {
         userRepository.save(newUser);
 
         return ResponseEntity.ok("Utilisateur enregistré avec succès !");
+    }
+
+    @PutMapping("disable/{username}")
+    public ResponseEntity<?> disableUser(@PathVariable String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            ErrorResponse errorResponse = new ErrorResponse(404, new Date(), "Erreur",
+                    MessageException.USER_NOT_FOUND);
+            return ResponseEntity.status(404).body(errorResponse);
+        }
+
+        User user = userOptional.get();
+        user.setEnabled(false);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Compte désactivé avec succès.");
+    }
+
+    @PutMapping("enable/{username}")
+    public ResponseEntity<?> enableUser(@PathVariable String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            ErrorResponse errorResponse = new ErrorResponse(404, new Date(), "Erreur",
+                    MessageException.USER_NOT_FOUND);
+            return ResponseEntity.status(404).body(errorResponse);
+        }
+
+        User user = userOptional.get();
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Compte activé avec succès.");
     }
 }
