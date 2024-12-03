@@ -1,4 +1,4 @@
-package com.igap.registry.dto.auth;
+package com.igap.registry.dto.auth.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class LoginDTO {
+public class LoginRequest {
     private String username;
     private String password;
 }

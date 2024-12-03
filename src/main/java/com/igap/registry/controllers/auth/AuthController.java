@@ -1,76 +1,103 @@
 package com.igap.registry.controllers.auth;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.igap.registry.dto.auth.request.LoginRequest;
+import com.igap.registry.dto.auth.response.LoginResponse;
+import com.igap.registry.dto.utils.ErrorResponse;
+import com.igap.registry.entities.core.user.User;
+import com.igap.registry.repositories.user.UserRepository;
+import com.igap.registry.security.jwt.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
-import com.igap.registry.dto.auth.LoginDTO;
-import com.igap.registry.dto.utils.ErrorResponse;
-import com.igap.registry.security.jwt.utils.JwtUtils;
+import javax.validation.Valid;
+import java.util.Map;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/accounts/")
 public class AuthController {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     @Autowired
-    ErrorResponse errorResponse;
-
-    @Autowired
-    JwtUtils jwtUtils;
-
-    @Autowired
-    User user;
+    public AuthController(
+            AuthenticationManager authenticationManager,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtUtils jwtUtils
+    ) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+    }
 
     @PostMapping("signin")
-    public ResponseEntity<?> authenticateUser(LoginDTO loginDTO) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(),
-                        loginDTO.getPassword()));
+            User userDetails = (User) authentication.getPrincipal();
+            Map<String, String> jwtCookie = jwtUtils.generateJwtToken(userDetails.getUsername(), 36000);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setStatus(200);
+            loginResponse.setMessage("Authentification réussie.");
+            loginResponse.setData(userDetails);
 
-        User userDetails = (User) authentication.getPrincipal();
-        Map<String, String> jwtCookie = jwtUtils.generateJwtToken(userDetails.getUsername(), 36000);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.get("cookie"))
+                    .body(loginResponse);
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+        } catch (BadCredentialsException e) {
+            ErrorResponse errorResponse = new ErrorResponse(401, "Nom d'utilisateur ou mot de passe incorrect.");
+            return ResponseEntity.status(401).body(errorResponse);
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(500, "Erreur interne du serveur.");
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
 
-        if (userDetails.getUsername() == null) {
-            errorResponse.setStatusCode(400);
-            errorResponse.setMessage(loginDTO.getUsername()+ "N'existe pas");
+    @PostMapping("register")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+            ErrorResponse errorResponse = new ErrorResponse(400, "Le nom d'utilisateur est déjà pris.");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
-        // statusResponse.setStatus(200);
-        // statusResponse.setMessage("Authentification reussie");
-        // statusResponse.setData(new UserInfoResponse(userDetails.getId(),
-        //         userDetails.getUsername(),
-        //         userDetails.getEmail(),
-        //         userDetails.getStatus(),
-        //         roles, jwtCookie.getValue(), userDetails.getProfil(), userDetails.getPhone()));
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            ErrorResponse errorResponse = new ErrorResponse(400, "L'adresse e-mail est déjà utilisée.");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(null);
+        // Création de l'utilisateur
+        User newUser = new User();
+        newUser.setUsername(registerRequest.getUsername());
+        newUser.setEmail(registerRequest.getEmail());
+        newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        newUser.setFirstName(registerRequest.getFirstName());
+        newUser.setLastName(registerRequest.getLastName());
+        newUser.setEnabled(true); 
+
+       
+        userRepository.save(newUser);
+
+        return ResponseEntity.ok("Utilisateur enregistré avec succès !");
     }
 }
