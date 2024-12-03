@@ -1,6 +1,7 @@
 package com.igap.registry.controllers.auth;
 
 import com.igap.registry.dto.auth.request.LoginRequest;
+import com.igap.registry.dto.auth.request.RegisterRequest;
 import com.igap.registry.dto.auth.response.LoginResponse;
 import com.igap.registry.dto.utils.ErrorResponse;
 import com.igap.registry.entities.core.user.User;
@@ -16,7 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.Date;
 import java.util.Map;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -34,8 +35,7 @@ public class AuthController {
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            JwtUtils jwtUtils
-    ) {
+            JwtUtils jwtUtils) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -43,15 +43,13 @@ public class AuthController {
     }
 
     @PostMapping("signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
-                            loginRequest.getPassword()
-                    )
-            );
+                            loginRequest.getPassword()));
 
             User userDetails = (User) authentication.getPrincipal();
             Map<String, String> jwtCookie = jwtUtils.generateJwtToken(userDetails.getUsername(), 36000);
@@ -66,36 +64,38 @@ public class AuthController {
                     .body(loginResponse);
 
         } catch (BadCredentialsException e) {
-            ErrorResponse errorResponse = new ErrorResponse(401, "Nom d'utilisateur ou mot de passe incorrect.");
+            ErrorResponse errorResponse = new ErrorResponse(401, new Date(), "Erreur",
+                    "Nom d'utilisateur ou mot de passe incorrect.");
             return ResponseEntity.status(401).body(errorResponse);
         } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse(500, "Erreur interne du serveur.");
+            ErrorResponse errorResponse = new ErrorResponse(500, new Date(), "Erreur", "Erreur interne du serveur.");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @PostMapping("register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            ErrorResponse errorResponse = new ErrorResponse(400, "Le nom d'utilisateur est déjà pris.");
+
+        if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
+            ErrorResponse errorResponse = new ErrorResponse(400, new Date(), "Erreur",
+                    "Le nom d'utilisateur est déjà pris.");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            ErrorResponse errorResponse = new ErrorResponse(400, "L'adresse e-mail est déjà utilisée.");
+        if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
+            ErrorResponse errorResponse = new ErrorResponse(400, new Date(), "Erreur",
+                    "L'adresse e-mail est déjà utilisée.");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
-        // Création de l'utilisateur
         User newUser = new User();
         newUser.setUsername(registerRequest.getUsername());
         newUser.setEmail(registerRequest.getEmail());
         newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         newUser.setFirstName(registerRequest.getFirstName());
         newUser.setLastName(registerRequest.getLastName());
-        newUser.setEnabled(true); 
+        newUser.setEnabled(true);
 
-       
         userRepository.save(newUser);
 
         return ResponseEntity.ok("Utilisateur enregistré avec succès !");
