@@ -22,6 +22,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * @author Joe Monkila
+ */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/accounts/")
