@@ -8,8 +8,8 @@ import com.igap.registry.entities.core.user.User;
 import com.igap.registry.helper.MessageException;
 import com.igap.registry.repositories.user.UserRepository;
 import com.igap.registry.security.jwt.utils.JwtUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,7 +35,6 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
-    @Autowired
     public AuthController(
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
@@ -61,7 +60,7 @@ public class AuthController {
 
             @SuppressWarnings("rawtypes")
             LoginResponse loginResponse = new LoginResponse();
-            loginResponse.setStatus(200);
+            loginResponse.setStatus(HttpStatus.OK.value());
             loginResponse.setMessage("Authentification réussie.");
             loginResponse.setData(userDetails);
 
@@ -70,12 +69,12 @@ public class AuthController {
                     .body(loginResponse);
 
         } catch (BadCredentialsException e) {
-            ErrorResponse errorResponse = new ErrorResponse(401, new Date(), "Erreur",
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), new Date(), "Erreur",
                     "Nom d'utilisateur ou mot de passe incorrect.");
-            return ResponseEntity.status(401).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse(500, new Date(), "Erreur", "Erreur interne du serveur.");
-            return ResponseEntity.status(500).body(errorResponse);
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), new Date(), "Erreur", "Erreur interne du serveur.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
@@ -83,13 +82,13 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
 
         if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
-            ErrorResponse errorResponse = new ErrorResponse(400, new Date(), "Erreur",
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), new Date(), "Erreur",
                     MessageException.ACCOUNT_NAME_IS_BUSY);
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
         if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
-            ErrorResponse errorResponse = new ErrorResponse(400, new Date(), "Erreur",
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), new Date(), "Erreur",
                     MessageException.ACCOUNT_MAIL_IS_BUSY);
             return ResponseEntity.badRequest().body(errorResponse);
         }
@@ -111,9 +110,9 @@ public class AuthController {
     public ResponseEntity<?> disableUser(@PathVariable String username) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse(404, new Date(), "Erreur",
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), new Date(), "Erreur",
                     MessageException.USER_NOT_FOUND);
-            return ResponseEntity.status(404).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
 
         User user = userOptional.get();
@@ -127,9 +126,9 @@ public class AuthController {
     public ResponseEntity<?> enableUser(@PathVariable String username) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse(404, new Date(), "Erreur",
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), new Date(), "Erreur",
                     MessageException.USER_NOT_FOUND);
-            return ResponseEntity.status(404).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
 
         User user = userOptional.get();
